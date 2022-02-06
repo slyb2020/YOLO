@@ -35,6 +35,7 @@ from wx.lib.agw.artmanager import ArtManager, RendererBase, DCSaver
 from wx.lib.agw.fmresources import ControlFocus, ControlPressed
 from wx.lib.agw.fmresources import FM_OPT_SHOW_CUSTOMIZE, FM_OPT_SHOW_TOOLBAR, FM_OPT_MINIBAR
 import datetime
+from DatasetOperationPanel import DatasetOperationPanel
 
 dirName = os.path.dirname(os.path.abspath(__file__))
 bitmapDir = os.path.join(dirName, 'bitmaps')
@@ -269,19 +270,6 @@ class MainPanel(wx.Panel):
         self.Bind(wx.adv.EVT_SASH_DRAGGED_RANGE, self.OnSashDrag, id=ID_WINDOW_LEFT,
                   id2=ID_WINDOW_BOTTOM)  # BOTTOM和LEFT顺序不能换，要想更改哪个先分，只需更改上面窗口定义的顺序
 
-    def OnParallelProduceChanged(self, event):
-        self.parallel_optimize_enable = self.work_zone_Panel.schedule_panel.parallel_enable_CHK.GetValue()
-        busy = PBI.PyBusyInfo("系统正在更新数据库，请稍候！", parent=None, title="系统消息对话框",
-                              icon=images.Smiles.GetBitmap())
-        wx.Yield()
-        self.AppendRecordInScheduleDB()
-        self.SystemInit()
-        self.work_zone_Panel.schedule_panel.MyRefresh()
-        self.work_zone_Panel.capacity_planning_panel.capacity_planning_grid.MyRefresh()
-        self.work_zone_Panel.processing_order_panel.MyRefresh()
-        self.work_zone_Panel.finish_order_panel.MyRefresh()
-        del busy
-
     def CreateBottomWindow(self):
         self.bottomWindow = wx.adv.SashLayoutWindow(self, ID_WINDOW_BOTTOM, style=wx.NO_BORDER | wx.adv.SW_3D)
         self.bottomWindow.SetDefaultSize((1000, 200))
@@ -320,15 +308,15 @@ class MainPanel(wx.Panel):
         panel = wx.Panel(item, -1, size=(300, 300))
         bitmap = wx.Bitmap("bitmaps/aquabutton.png",
                            wx.BITMAP_TYPE_PNG)
-        self.NewOrderBTN = AB.AquaButton(panel, wx.ID_ANY, bitmap, "新建订单", size=(100, 50))
-        self.NewOrderBTN.SetForegroundColour(wx.BLACK)
-        self.NewOrderBTN.Enable(True)
-        self.NewDoorBTN = AB.AquaButton(panel, wx.ID_ANY, bitmap, "排产演示", size=(100, 50))
-        self.NewDoorBTN.SetForegroundColour(wx.BLACK)
+        self.datasetOperationrBTN = AB.AquaButton(panel, wx.ID_ANY, bitmap, "数据集操作", size=(100, 50))
+        self.datasetOperationrBTN.SetForegroundColour(wx.BLACK)
+        self.datasetOperationrBTN.Enable(True)
+        self.YOLOv1rBTN = AB.AquaButton(panel, wx.ID_ANY, bitmap, "YOLOv1", size=(100, 50))
+        self.YOLOv1rBTN.SetForegroundColour(wx.BLACK)
         static = wx.StaticLine(panel, -1)
         vbox = wx.BoxSizer(wx.VERTICAL)
-        vbox.Add(self.NewOrderBTN, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
-        vbox.Add(self.NewDoorBTN, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
+        vbox.Add(self.datasetOperationrBTN, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
+        vbox.Add(self.YOLOv1rBTN, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
         vbox.Add(static, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
         panel.SetSizer(vbox)
         self._pnl.AddFoldPanelWindow(item, panel, fpb.FPB_ALIGN_WIDTH, 5, 0)
@@ -357,8 +345,8 @@ class WorkZonePanel(wx.Panel):
         idx4 = il.Add(images._rt_undo.GetBitmap())
         idx5 = il.Add(images._rt_save.GetBitmap())
         idx6 = il.Add(images._rt_redo.GetBitmap())
-        # self.processing_order_panel=OrderProcessPanel(self.notebook,self.master)
-        # self.notebook.AddPage(self.processing_order_panel, PAGE_NAME[0])
         hbox = wx.BoxSizer()
         hbox.Add(self.notebook, 1, wx.EXPAND)
+        self.datasetOperationPNL = DatasetOperationPanel(self.notebook,self.log)
+        self.notebook.AddPage(self.datasetOperationPNL, "数据集操作面板")
         self.SetSizer(hbox)
