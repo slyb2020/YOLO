@@ -36,6 +36,7 @@ from wx.lib.agw.fmresources import ControlFocus, ControlPressed
 from wx.lib.agw.fmresources import FM_OPT_SHOW_CUSTOMIZE, FM_OPT_SHOW_TOOLBAR, FM_OPT_MINIBAR
 import datetime
 from DatasetOperationPanel import DatasetOperationPanel
+from YOLOv1Panel import YOLOv1Panel
 
 dirName = os.path.dirname(os.path.abspath(__file__))
 bitmapDir = os.path.join(dirName, 'bitmaps')
@@ -286,6 +287,7 @@ class MainPanel(wx.Panel):
             self.work_zone_Panel.notebook.SetSelection(0)
         if id == ID_YOLOv1_BTN:
             self.work_zone_Panel.notebook.SetSelection(1)
+
     def OnSize(self, event):
         wx.adv.LayoutAlgorithm().LayoutWindow(self, self.work_zone_Panel)
         event.Skip()
@@ -336,7 +338,7 @@ class WorkZonePanel(wx.Panel):
         self.master = master
         self.log = log
         self.notebook = wx.Notebook(self, -1, size=(21, 21), style=
-                                    wx.BK_DEFAULT
+        wx.BK_DEFAULT
                                     # wx.BK_TOP
                                     # wx.BK_BOTTOM
                                     # wx.BK_LEFT
@@ -354,8 +356,8 @@ class WorkZonePanel(wx.Panel):
         idx6 = il.Add(images._rt_redo.GetBitmap())
         hbox = wx.BoxSizer()
         hbox.Add(self.notebook, 1, wx.EXPAND)
-        self.datasetOperationPNL = DatasetOperationPanel(self.notebook,self.log)
+        self.datasetOperationPNL = DatasetOperationPanel(self.notebook, self.log)
         self.notebook.AddPage(self.datasetOperationPNL, "数据集操作面板")
-        self.yolov1PNL = wx.Panel(self.notebook)
+        self.yolov1PNL = YOLOv1Panel(self.notebook, self.log)
         self.notebook.AddPage(self.yolov1PNL, "YOLOv1面板")
         self.SetSizer(hbox)

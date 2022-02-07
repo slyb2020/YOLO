@@ -11,14 +11,13 @@ from ID_DEFINE import *
 from DatasetLabelProcess import *
 
 
-class DatasetOperationPanel(wx.Panel):
+class YOLOv1Panel(wx.Panel):
     def __init__(self, parent, log):
         wx.Panel.__init__(self, parent, -1)
         self.log = log
         self.datasetDir = None
-        self.typeList = ['检测数据集', '识别数据集', '分割数据集']
         self.editDatasetBTN = wx.Button(self, -1, label="编辑数据集", size=(180, 35))
-        self.datasetTree = DatasetTree(self, self.log, size=(180, 300))
+        self.datasetTree = DatasetTree(self, self.log, size=(180, 300), wantedList=['DETECTION'])
         self.listDataPanel = ListDataPanel(self, self.log, [])
         self.middlePanel = PictureShowPanel(self, self.log, size=(630, -1))
         self.rightPanel = wx.Panel(self, -1, size=(300, -1), style=wx.BORDER_THEME)
@@ -26,10 +25,6 @@ class DatasetOperationPanel(wx.Panel):
         vvbox = wx.BoxSizer(wx.VERTICAL)
         vvbox.Add(self.editDatasetBTN, 0)
         vvbox.Add(self.datasetTree, 1)
-        for i in self.typeList:
-            checkBox = wx.CheckBox(self, label=i, size=(-1, 25))
-            checkBox.SetValue(True)
-            vvbox.Add(checkBox, 0)
         hbox.Add(vvbox, 0, wx.EXPAND)
         hbox.Add(self.listDataPanel, 0, wx.EXPAND)
         hbox.Add(self.middlePanel, 1, wx.EXPAND)
