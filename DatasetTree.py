@@ -13,7 +13,37 @@ from math import *
 from ID_DEFINE import *
 import string
 import images
+import xml.etree.ElementTree as ET
+import os
+import cv2
 
+def GetDatasetInfo():
+    """
+    把图像imageId的xml文件转换为目标检测的label文件(txt),
+    其中包含物体的类别，bbox的左上角点坐标以及bbox的宽、高
+    并将四个物理量归一化
+    :param imageId:
+    :return:
+    """
+    infoFilename = "DatasetInformation"
+    result = []
+    inputFilename = open(infoFilename + '.xml')
+    # outputFilename = open('./labels/%s.txt' % (imageId), 'w')
+    tree = ET.parse(inputFilename)
+    root = tree.getroot()
+    for obj in root.iter('Dataset'):
+        datasetName = obj.find('name').text
+        subList = []
+        for subSet in obj.iter('SubDataset'):
+            subDatasetName = subSet.find('name').text
+            grandList = []
+            for grandSet in subSet.iter('GrandDataset'):
+                grandDatasetName = grandSet.find('name').text
+                grandDatasetDir = grandSet.find('dir').text
+                grandList.append([grandDatasetName,grandDatasetDir])
+            subList.append([subDatasetName,grandList])
+        result.append([datasetName,subList])
+    return result
 
 class MyTreeCtrl(wx.TreeCtrl):
     def __init__(self, parent, id, pos, size, style, log):
@@ -32,16 +62,18 @@ class MyTreeCtrl(wx.TreeCtrl):
 class DatasetTree(wx.Panel):
     def __init__(self, parent, log, size):
         # Use the WANTS_CHARS style so the panel doesn't eat the Return key.
-        wx.Panel.__init__(self, parent, -1, size, style=wx.WANTS_CHARS)
+        wx.Panel.__init__(self, parent, -1, size, style=wx.BORDER_THEME)
         self.Bind(wx.EVT_SIZE, self.OnSize)
         self.log = log
         tID = wx.NewIdRef()
-        datasetList = [
-            ["ImageNet", [["2017", []], ["2018", []]]],
-            ["FasionMNIST", [["2007", []], ["2012", []]]],
-            ["MNIST", [["2007", []], ["2012", []]]],
-            ["猫狗大战", []],
-        ]
+        # datasetList = [
+        #     ["ImageNet", [["2017", []], ["2018", []]]],
+        #     ["FasionMNIST", [["2007", []], ["2012", []]]],
+        #     ["MNIST", [["2007", []], ["2012", []]]],
+        #     ["猫狗大战", []],
+        # ]
+        datasetList = GetDatasetInfo()
+
         self.tree = MyTreeCtrl(self, tID, wx.DefaultPosition, size,
                                wx.TR_HAS_BUTTONS
                                | wx.TR_EDIT_LABELS
@@ -73,7 +105,7 @@ class DatasetTree(wx.Panel):
                 self.tree.SetItemImage(last, fldropenidx, wx.TreeItemIcon_Expanded)
                 for k in j[1]:
                     item = self.tree.AppendItem(last, k[0])
-                    self.tree.SetItemData(item, "孙集")
+                    self.tree.SetItemData(item, "孙集"+k[1])
                     self.tree.SetItemImage(item, fileidx, wx.TreeItemIcon_Normal)
                     self.tree.SetItemImage(item, smileidx, wx.TreeItemIcon_Selected)
         self.tree.ExpandAll()
@@ -129,3 +161,10 @@ class DatasetTree(wx.Panel):
                     self.tree.SetItemImage(item, smileidx, wx.TreeItemIcon_Selected)
         self.tree.ExpandAll()
         # self.tree.Refresh()
+
+
+
+if __name__ == "__main__":
+    result = GetDatasetInfo()
+    print("result=",result)
+

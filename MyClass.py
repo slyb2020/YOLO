@@ -278,7 +278,14 @@ class MainPanel(wx.Panel):
         # win.SetBackgroundColour(wx.Colour(0, 0, 255))
         self.bottomWindow.SetSashVisible(wx.adv.SASH_TOP, True)
         self.bottomWindow.SetExtraBorderSize(5)
+        self.Bind(wx.EVT_BUTTON, self.OnButton)
 
+    def OnButton(self, event):
+        id = event.GetId()
+        if id == ID_DATASET_BTN:
+            self.work_zone_Panel.notebook.SetSelection(0)
+        if id == ID_YOLOv1_BTN:
+            self.work_zone_Panel.notebook.SetSelection(1)
     def OnSize(self, event):
         wx.adv.LayoutAlgorithm().LayoutWindow(self, self.work_zone_Panel)
         event.Skip()
@@ -308,10 +315,10 @@ class MainPanel(wx.Panel):
         panel = wx.Panel(item, -1, size=(300, 300))
         bitmap = wx.Bitmap("bitmaps/aquabutton.png",
                            wx.BITMAP_TYPE_PNG)
-        self.datasetOperationrBTN = AB.AquaButton(panel, wx.ID_ANY, bitmap, "数据集操作", size=(100, 50))
+        self.datasetOperationrBTN = AB.AquaButton(panel, ID_DATASET_BTN, bitmap, "数据集操作", size=(100, 50))
         self.datasetOperationrBTN.SetForegroundColour(wx.BLACK)
         self.datasetOperationrBTN.Enable(True)
-        self.YOLOv1rBTN = AB.AquaButton(panel, wx.ID_ANY, bitmap, "YOLOv1", size=(100, 50))
+        self.YOLOv1rBTN = AB.AquaButton(panel, ID_YOLOv1_BTN, bitmap, "YOLOv1", size=(100, 50))
         self.YOLOv1rBTN.SetForegroundColour(wx.BLACK)
         static = wx.StaticLine(panel, -1)
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -349,4 +356,6 @@ class WorkZonePanel(wx.Panel):
         hbox.Add(self.notebook, 1, wx.EXPAND)
         self.datasetOperationPNL = DatasetOperationPanel(self.notebook,self.log)
         self.notebook.AddPage(self.datasetOperationPNL, "数据集操作面板")
+        self.yolov1PNL = wx.Panel(self.notebook)
+        self.notebook.AddPage(self.yolov1PNL, "YOLOv1面板")
         self.SetSizer(hbox)

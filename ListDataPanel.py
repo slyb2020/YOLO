@@ -19,7 +19,7 @@ class ListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
         listmix.ListCtrlAutoWidthMixin.__init__(self)
 class ListDataPanel(wx.Panel, listmix.ColumnSorterMixin):
     def __init__(self, parent, log,data):
-        wx.Panel.__init__(self, parent, -1, style=wx.WANTS_CHARS)
+        wx.Panel.__init__(self, parent, -1, style=wx.BORDER_THEME)
         self.log = log
         self.data=data
         tID = wx.NewIdRef()
@@ -46,7 +46,7 @@ class ListDataPanel(wx.Panel, listmix.ColumnSorterMixin):
         self.SetSizer(sizer)
         self.SetAutoLayout(True)
         # self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnItemSelected, self.list)
-    def ReCreateTree(self,data):
+    def ReCreate(self, data):
         self.data=data
         self.list.ClearAll()
         self.PopulateList(data)
@@ -59,27 +59,23 @@ class ListDataPanel(wx.Panel, listmix.ColumnSorterMixin):
         info.Align = wx.LIST_FORMAT_LEFT
         info.Text = "文件名"
         self.list.InsertColumn(0, info)
-        info.Align = wx.LIST_FORMAT_LEFT
-        info.Text = "属性"
-        self.list.InsertColumn(1, info)
-        info.Align = wx.LIST_FORMAT_LEFT
-        info.Text = "大小"
-        self.list.InsertColumn(2, info)
+        # info.Align = wx.LIST_FORMAT_LEFT
+        # info.Text = "属性"
+        # self.list.InsertColumn(1, info)
+        # info.Align = wx.LIST_FORMAT_LEFT
+        # info.Text = "大小"
+        # self.list.InsertColumn(2, info)
         for i in data:
-            index = self.list.InsertItem(self.list.GetItemCount(), i[0],self.idx1)
+            index = self.list.InsertItem(self.list.GetItemCount(), i,self.idx1)
             item=self.list.GetItem(index,1)
             # index=self.data.index(i)
-            self.list.SetItem(index, 0, i[0])
-            self.list.SetItem(index, 1, i[1])
-            self.list.SetItem(index, 2, i[12])
-            self.list.SetItemData(index,int(i[2]))
-            from Function import GetFaceCharacter
-            error,ls=GetFaceCharacter(self.log, int(i[2]))
-            if(ls==''):
-                self.list.SetItemImage(index,self.sm_dn)
-        self.list.SetColumnWidth(0,100)
-        self.list.SetColumnWidth(1, 50)
-        self.list.SetColumnWidth(2, 50)
+            self.list.SetItem(index, 0, i)
+            # self.list.SetItem(index, 1, i[1])
+            # self.list.SetItem(index, 2, i[2])
+            # self.list.SetItemData(index,i[0])
+        self.list.SetColumnWidth(0,150)
+        # self.list.SetColumnWidth(1, 70)
+        # self.list.SetColumnWidth(2, 50)
         self.currentItem = 0
     def getColumnText(self, index, col):
         item = self.list.GetItem(index, col)
