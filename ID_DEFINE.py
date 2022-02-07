@@ -38,4 +38,3 @@ ID_YOLOv1_BTN = wx.NewId()
 CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep',
            'airplane', 'bicycle', 'boat', 'bus', 'car', 'motobike', 'train',
            'bottle', 'chair', 'dining table', 'potted plant', 'sofa', 'tvmonitor']
-

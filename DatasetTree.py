@@ -17,7 +17,8 @@ import xml.etree.ElementTree as ET
 import os
 import cv2
 
-def GetDatasetInfo():
+
+def GetDatasetInfo():  # 解析DatasetInformation.xml文件，获取本地所有数据集的相关信息
     """
     把图像imageId的xml文件转换为目标检测的label文件(txt),
     其中包含物体的类别，bbox的左上角点坐标以及bbox的宽、高
@@ -27,7 +28,7 @@ def GetDatasetInfo():
     """
     infoFilename = "DatasetInformation"
     result = []
-    inputFilename = open(infoFilename + '.xml')
+    inputFilename = open(infoFilename + '.xml', encoding='utf-8')
     # outputFilename = open('./labels/%s.txt' % (imageId), 'w')
     tree = ET.parse(inputFilename)
     root = tree.getroot()
@@ -39,11 +40,13 @@ def GetDatasetInfo():
             grandList = []
             for grandSet in subSet.iter('GrandDataset'):
                 grandDatasetName = grandSet.find('name').text
+                grandDatasetType = grandSet.find('type').text
                 grandDatasetDir = grandSet.find('dir').text
-                grandList.append([grandDatasetName,grandDatasetDir])
-            subList.append([subDatasetName,grandList])
-        result.append([datasetName,subList])
+                grandList.append([grandDatasetName, grandDatasetType, grandDatasetDir])
+            subList.append([subDatasetName, grandList])
+        result.append([datasetName, subList])
     return result
+
 
 class MyTreeCtrl(wx.TreeCtrl):
     def __init__(self, parent, id, pos, size, style, log):
@@ -60,11 +63,12 @@ class MyTreeCtrl(wx.TreeCtrl):
 
 
 class DatasetTree(wx.Panel):
-    def __init__(self, parent, log, size):
+    def __init__(self, parent, log, size, wantedList=['DETECTION', 'RECOGNITION']):
         # Use the WANTS_CHARS style so the panel doesn't eat the Return key.
         wx.Panel.__init__(self, parent, -1, size, style=wx.BORDER_THEME)
         self.Bind(wx.EVT_SIZE, self.OnSize)
         self.log = log
+        self.wantedList = wantedList
         tID = wx.NewIdRef()
         # datasetList = [
         #     ["ImageNet", [["2017", []], ["2018", []]]],
@@ -104,10 +108,11 @@ class DatasetTree(wx.Panel):
                 self.tree.SetItemImage(last, fldridx, wx.TreeItemIcon_Normal)
                 self.tree.SetItemImage(last, fldropenidx, wx.TreeItemIcon_Expanded)
                 for k in j[1]:
-                    item = self.tree.AppendItem(last, k[0])
-                    self.tree.SetItemData(item, "孙集"+k[1])
-                    self.tree.SetItemImage(item, fileidx, wx.TreeItemIcon_Normal)
-                    self.tree.SetItemImage(item, smileidx, wx.TreeItemIcon_Selected)
+                    if k[1] in self.wantedList:
+                        item = self.tree.AppendItem(last, k[0])
+                        self.tree.SetItemData(item, "孙集" + k[2])
+                        self.tree.SetItemImage(item, fileidx, wx.TreeItemIcon_Normal)
+                        self.tree.SetItemImage(item, smileidx, wx.TreeItemIcon_Selected)
         self.tree.ExpandAll()
         self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.OnBeginEdit, self.tree)
         self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.OnEndEdit, self.tree)
@@ -163,8 +168,6 @@ class DatasetTree(wx.Panel):
         # self.tree.Refresh()
 
 
-
 if __name__ == "__main__":
     result = GetDatasetInfo()
-    print("result=",result)
-
+    print("result=", result)
