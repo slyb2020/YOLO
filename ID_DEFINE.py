@@ -10,6 +10,7 @@
 """
 
 import wx
+import os
 
 MENU_CHECK_IN = wx.NewIdRef()
 MENU_CHECK_OUT = wx.NewIdRef()
@@ -38,3 +39,6 @@ ID_YOLOv1_BTN = wx.NewId()
 CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep',
            'airplane', 'bicycle', 'boat', 'bus', 'car', 'motobike', 'train',
            'bottle', 'chair', 'dining table', 'potted plant', 'sofa', 'tvmonitor']
+
+dirName = os.path.dirname(os.path.abspath(__file__))
+modelsDir = os.path.join(dirName, "Models\\")
