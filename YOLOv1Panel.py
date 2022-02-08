@@ -9,7 +9,8 @@ import os
 import cv2
 from ID_DEFINE import *
 from DatasetLabelProcess import *
-
+from PictureShowPanel import YOLOPictureShowPanel
+from YOLOv1ControlPanel import YOLOv1ControlPanel
 
 class YOLOv1Panel(wx.Panel):
     def __init__(self, parent, log):
@@ -19,8 +20,8 @@ class YOLOv1Panel(wx.Panel):
         self.editDatasetBTN = wx.Button(self, -1, label="编辑数据集", size=(180, 35))
         self.datasetTree = DatasetTree(self, self.log, size=(180, 300), wantedList=['DETECTION'])
         self.listDataPanel = ListDataPanel(self, self.log, [])
-        self.middlePanel = PictureShowPanel(self, self.log, size=(630, -1))
-        self.rightPanel = wx.Panel(self, -1, size=(300, -1), style=wx.BORDER_THEME)
+        self.middlePanel = YOLOPictureShowPanel(self, self.log, size=(630, -1), gap=True)
+        self.rightPanel = YOLOv1ControlPanel(self, self.log, size=(300, -1))
         hbox = wx.BoxSizer()
         vvbox = wx.BoxSizer(wx.VERTICAL)
         vvbox.Add(self.editDatasetBTN, 0)
