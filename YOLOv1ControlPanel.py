@@ -19,30 +19,39 @@ import torch.optim as optim
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm  # python的进度条模块
 import wx.lib.scrolledpanel as scrolled
+from ListDataPanel import ResultDisplayPanel
 
-
-class ResultDisplayPanel(scrolled.ScrolledPanel):
-    def __init__(self, parent, log, data):
-        self.log = log
-        self.parent = parent
-        self.data = data
-        scrolled.ScrolledPanel.__init__(self, parent, -1)
-        self.Recreate(self.data)
-
-    def Recreate(self, data):
-        self.DestroyChildren()
-        self.data = data
-        vbox = wx.BoxSizer(wx.VERTICAL)
-        vbox.Add((-1, 5))
-        hhbox = wx.BoxSizer()
-        hhbox.Add((10, -1))
-        hhbox.Add(wx.StaticText(self, label="第%d行，第%d列BOX数据：" % (3, 4)))
-        vbox.Add(hhbox, 0, wx.EXPAND)
-        for i in range(100):
-            vbox.Add(wx.Button(self, label="Button%d" % i, size=(100, 30)), 0, wx.ALL, 10)
-        self.SetSizer(vbox)
-        self.SetAutoLayout(1)
-        self.SetupScrolling()
+# class ResultDisplayPanel(scrolled.ScrolledPanel):
+#     def __init__(self, parent, log):
+#         self.log = log
+#         self.parent = parent
+#         scrolled.ScrolledPanel.__init__(self, parent, -1)
+#         self.Recreate()
+#
+#     def Recreate(self):
+#         self.DestroyChildren()
+#         vbox = wx.BoxSizer(wx.VERTICAL)
+#         if self.parent.currentPosition:
+#             row = self.parent.currentPosition[0]
+#             col = self.parent.currentPosition[1]
+#             bbox = []
+#             bbox.append(self.parent.bbox[row*7+col])
+#             bbox.append(self.parent.bbox[2*(row*7+col)])
+#             vbox.Add((-1, 5))
+#             hhbox = wx.BoxSizer()
+#             hhbox.Add((10, -1))
+#             hhbox.Add(wx.StaticText(self, label="第%d行，第%d列BOX数据：" % (row + 1, col + 1)))
+#             vbox.Add(hhbox, 0, wx.EXPAND)
+#             for box in bbox:
+#                 hhbox = wx.BoxSizer()
+#                 hhbox.Add((10, -1))
+#                 hhbox.Add(wx.StaticText(self, label="中心点:", size=(50, -1)), 0, wx.TOP, 5)
+#                 self.centerPointTXT=wx.TextCtrl(self, size=(60, -1))
+#                 hhbox.Add(self.centerPointTXT, 0)
+#                 vbox.Add(hhbox, 0, wx.EXPAND)
+#         self.SetSizer(vbox)
+#         self.SetAutoLayout(1)
+#         self.SetupScrolling()
 
 
 # 注意检查一下输入数据的格式，到底是xywh还是xyxy
@@ -94,6 +103,7 @@ class YOLOv1ControlPanel(wx.Panel):
         wx.Panel.__init__(self, parent, -1, size=size, style=wx.FULL_REPAINT_ON_RESIZE | wx.BORDER_THEME)
         self.parent = parent
         self.log = log
+        self.currentPosition = None
         self.SetBackgroundColour(wx.Colour(240, 240, 240))
         self.pretrainedModelList = os.listdir(modelsDir)
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -119,8 +129,16 @@ class YOLOv1ControlPanel(wx.Panel):
         vbox.Add((-1, 3))
         vbox.Add(wx.StaticLine(self, style=wx.HORIZONTAL), 0, wx.EXPAND)
         vbox.Add((-1, 3))
-        resultDisplayPanel = ResultDisplayPanel(self, self.log, [])
-        vbox.Add(resultDisplayPanel, 1, wx.EXPAND)
+        hhbox = wx.BoxSizer()
+        hhbox.Add((10, -1))
+        if self.currentPosition:
+            self.label = wx.StaticText(self, label="第%d行，第%d列BOX数据：" % (self.currentPosition[0] + 1, self.currentPosition[1] + 1))
+        else:
+            self.label = wx.StaticText(self, label="第 行，第 列BOX数据：")
+        hhbox.Add(self.label,0)
+        vbox.Add(hhbox, 0, wx.EXPAND)
+        self.resultDisplayPanel = ResultDisplayPanel(self, self.log)
+        vbox.Add(self.resultDisplayPanel, 1, wx.EXPAND)
         self.SetSizer(vbox)
         self.Bind(wx.EVT_BUTTON, self.OnStartDetection)
 
@@ -139,8 +157,7 @@ class YOLOv1ControlPanel(wx.Panel):
         self.spendTimeTXT.SetValue("%.4f毫秒" % ((endTime - startTime) * 1000))
         self.pred = np.squeeze(self.pred)
         self.pred = self.pred.permute((1, 2, 0))
-        bbox = labels2bbox(self.pred)
-        print(bbox)
+        self.bbox = labels2bbox(self.pred)
 
 
 # 发现一个问题，使用torch.load()方法，只有在main里能用，在子程序中使用会报错

@@ -40,6 +40,10 @@ CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep',
            'airplane', 'bicycle', 'boat', 'bus', 'car', 'motobike', 'train',
            'bottle', 'chair', 'dining table', 'potted plant', 'sofa', 'tvmonitor']
 
+CLASSES2 = ['人', '鸟', '猫', '牛', '狗', '马', '羊',
+           '飞机', '自行车', '船', '公交车', '小汽车', '摩托车', '火车',
+           '瓶子', '椅子', '餐桌', 'potted plant', '沙发', '显示器']
+
 dirName = os.path.dirname(os.path.abspath(__file__))
 modelsDir = os.path.join(dirName, "Models\\")
 ButtonIdArray = [

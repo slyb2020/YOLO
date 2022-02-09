@@ -37,11 +37,17 @@ class YOLOv1Panel(wx.Panel):
         self.Bind(wx.EVT_BUTTON, self.OnButton)
 
     def OnButton(self, event):
+        data = []
         objId = event.GetId()
         for row, buttonList in enumerate(ButtonIdArray):
             if objId in buttonList:
                 col = buttonList.index(objId)
-                print(row, col)
+                self.rightPanel.currentPosition = (row,col)
+                data.append(list(self.rightPanel.bbox[row*7+col].detach().numpy()))
+                data.append(list(self.rightPanel.bbox[2*(row*7+col)].detach().numpy()))
+                self.rightPanel.resultDisplayPanel.ReCreate(data)
+                break
+        self.rightPanel.label.SetLabel("第%d行，第%d列BOX数据：" % (row + 1, col + 1))
         event.Skip()
 
     def OnUpdateDatasetTree(self, event):
