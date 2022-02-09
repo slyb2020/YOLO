@@ -1,13 +1,5 @@
 #!/usr/bin/env python
 # encoding: utf-8
-'''
-@author: slyb
-@license: (C) Copyright 2017-2020, 天津定智科技有限公司.
-@contact: slyb@tju.edu.cn
-@file: DatasetTree.py
-@time: 2019/9/1 15:54
-@desc:
-'''
 import wx
 from math import *
 from ID_DEFINE import *
@@ -142,7 +134,6 @@ class DatasetTree(wx.Panel):
         fldropenidx = il.Add(wx.ArtProvider.GetBitmap(wx.ART_FOLDER_OPEN, wx.ART_OTHER, isz))
         fileidx = il.Add(wx.ArtProvider.GetBitmap(wx.ART_FLOPPY, wx.ART_OTHER, isz))
         smileidx = il.Add(wx.ArtProvider.GetBitmap(wx.ART_FLOPPY, wx.ART_OTHER, isz))
-        # smileidx    = il.Add(images.Smiles.GetBitmap())
         self.tree.SetImageList(il)
         self.il = il
         self.root = self.tree.AddRoot("数据集")
