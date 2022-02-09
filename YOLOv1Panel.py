@@ -12,6 +12,7 @@ from DatasetLabelProcess import *
 from PictureShowPanel import YOLOPictureShowPanel
 from YOLOv1ControlPanel import YOLOv1ControlPanel
 
+
 class YOLOv1Panel(wx.Panel):
     def __init__(self, parent, log):
         wx.Panel.__init__(self, parent, -1)
@@ -33,6 +34,15 @@ class YOLOv1Panel(wx.Panel):
         self.SetSizer(hbox)
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnUpdateDatasetTree)
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnDatasetListSelectionChanged, self.listDataPanel.list)
+        self.Bind(wx.EVT_BUTTON, self.OnButton)
+
+    def OnButton(self, event):
+        objId = event.GetId()
+        for row, buttonList in enumerate(ButtonIdArray):
+            if objId in buttonList:
+                col = buttonList.index(objId)
+                print(row, col)
+        event.Skip()
 
     def OnUpdateDatasetTree(self, event):
         item = self.datasetTree.tree.GetFocusedItem()

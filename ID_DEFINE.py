@@ -42,3 +42,12 @@ CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep',
 
 dirName = os.path.dirname(os.path.abspath(__file__))
 modelsDir = os.path.join(dirName, "Models\\")
+ButtonIdArray = [
+    [wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId()],
+    [wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId()],
+    [wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId()],
+    [wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId()],
+    [wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId()],
+    [wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId()],
+    [wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId(),wx.NewId()],
+]

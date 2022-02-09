@@ -47,7 +47,7 @@ class YOLOPictureShowPanel(wx.Panel):
         for i in range(7):
             row = []
             for j in range(7):
-                button = wx.Button(self, name="%s_%s" % (i, j))
+                button = wx.Button(self, id=ButtonIdArray[i][j])
                 row.append(button)
                 gbox.Add(button, 1, wx.EXPAND)
             self.buttonArray.append(row)
