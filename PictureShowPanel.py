@@ -44,6 +44,8 @@ class YOLOPictureShowPanel(wx.Panel):
         self.gap = 1 if gap else 0
         self.bbox = None
         self.enablePicture = True
+        self.enableLabel = True
+        self.enableBox = True
 
         gbox = wx.GridSizer(7, 0, 0)
         self.buttonArray = []
@@ -66,26 +68,28 @@ class YOLOPictureShowPanel(wx.Panel):
             shape = self.img.shape
             if not self.enablePicture:
                 self.img = np.array(torch.zeros(size=shape, dtype=torch.uint8) + 255)
-            for label in self.labelList:
-                pt1 = (int(label[1][0] * self.width - label[1][2] * self.width / 2),
-                       int(label[1][1] * self.height - label[1][3] * self.height / 2))
-                pt2 = (int(label[1][0] * self.width + label[1][2] * self.width / 2),
-                       int(label[1][1] * self.height + label[1][3] * self.height / 2))
-                cv2.putText(self.img, CLASSES[int(label[0])], pt1, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
-                cv2.rectangle(self.img, pt1, pt2, (0, 0, 255, 2))
-            if self.bbox != None:
-                h, w = self.img.shape[0:2]
-                n = self.bbox.size()[0]
-                for i in range(n):
-                    p1 = (self.width * self.bbox[i, 1], self.height * self.bbox[i, 2])
-                    p2 = (self.width * self.bbox[i, 3], self.height * self.bbox[i, 4])
-                    cls_name = CLASSES[int(self.bbox[i, 0])]
-                    confidence = self.bbox[i, 5]
-                    # p1 = p1.numpy()
-                    p1 = (int(p1[0].detach().numpy()), int(p1[1].detach().numpy()))
-                    p2 = (400, 400)
-                    cv2.rectangle(self.img, p1, p2, color=COLOR[int(self.bbox[i, 0])])
-                    cv2.putText(self.img, cls_name, p1, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
+            if self.enableLabel:
+                for label in self.labelList:
+                    pt1 = (int(label[1][0] * self.width - label[1][2] * self.width / 2),
+                           int(label[1][1] * self.height - label[1][3] * self.height / 2))
+                    pt2 = (int(label[1][0] * self.width + label[1][2] * self.width / 2),
+                           int(label[1][1] * self.height + label[1][3] * self.height / 2))
+                    cv2.putText(self.img, CLASSES[int(label[0])], pt1, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
+                    cv2.rectangle(self.img, pt1, pt2, (0, 0, 255, 2))
+            if self.enableBox:
+                if self.BBOX != None:
+                    h, w = self.img.shape[0:2]
+                    n = self.BBOX.size()[0]
+                    for i in range(n):
+                        p1 = (self.width * self.BBOX[i, 1], self.height * self.BBOX[i, 2])
+                        p2 = (self.width * self.BBOX[i, 3], self.height * self.BBOX[i, 4])
+                        cls_name = CLASSES[int(self.BBOX[i, 0])]
+                        confidence = self.BBOX[i, 5]
+                        # p1 = p1.numpy()
+                        p1 = (int(p1[0].detach().numpy()), int(p1[1].detach().numpy()))
+                        p2 = (400, 400)
+                        cv2.rectangle(self.img, p1, p2, color=COLOR[int(self.bbox[i, 0])])
+                        cv2.putText(self.img, cls_name, p1, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
             x, y = self.img.shape[1] / len(self.buttonArray[0]), self.img.shape[0] / len(self.buttonArray)
             w, h = self.buttonArray[0][0].GetSize()
             for row, rowButtonList in enumerate(self.buttonArray):

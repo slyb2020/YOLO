@@ -56,12 +56,6 @@ class YOLOv1_resnet(nn.Module):
         return input.reshape(-1, (5 * NUM_BBOX + len(CLASSES)), 7, 7)  # 记住最后要reshape一下输出数据
 
 
-# if __name__ == '__main__':
-#     x = torch.randn((1,3,448,448))
-#     net = YOLOv1_resnet()
-#     print(net)
-#     y = net(x)
-#     print(y.size())
 if __name__ == '__main__':
     epoch = 50
     batchsize = 5
