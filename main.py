@@ -3,11 +3,10 @@
 from MyClass import *
 from ID_DEFINE import *
 import torch.nn as nn
-from YOLOv1Pytorch import *
-from YOLOv1Pytorch2 import *
+from YOLOv1Algorithm import YOLOv1_resnet
 
 
-VERSION_STRING = "20220206A"
+VERSION_STRING = "20220211A"
 
 class FlatMenuFrame(wx.Frame):
     def __init__(self, parent):

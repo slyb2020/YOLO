@@ -1,18 +1,120 @@
-# https://blog.csdn.net/weixin_41424926/article/details/105383064  对应的例程源代码
 from torch.utils.data import Dataset, DataLoader
-from torch import nn
-import xml.etree.ElementTree as ET
-import os
-import cv2
-from ID_DEFINE import *
-import numpy as np
-import torchvision.transforms as transforms
+import torchvision.models as tvmodel
+import torch.nn as nn
 import torch
+import numpy as np
+import matplotlib.pyplot as plt
+import torch.utils.data.dataloader as Loader
+import torchvision
+import torchvision.transforms as transforms
 
-NUM_BBOX = 2
+import torch.nn.functional as F
+import torch.optim as optim
+from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm  # python的进度条模块
+
+NUM_BBOX = 2  # YOLOv1每次预测，都将输入图片划分成7*7=49个格子，对每个格子都给出两个预测目标。每个预测目标由中心点坐标（x, y),
+# 目标宽高（w, h)，以及预测可信度p这5个数据组成。2个预测目标共10个数据，再加上20个类别的可信度，共30个数据。所以预测结果的shape是(7*7*30)
+
 CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep',
            'aeroplane', 'bicycle', 'boat', 'bus', 'car', 'motorbike', 'train',
            'bottle', 'chair', 'dining table', 'potted plant', 'sofa', 'tvmonitor']
+
+
+def draw_bbox(img, bbox):
+    """
+    根据bbox的信息在图像上绘制bounding box
+    :param img: 绘制bbox的图像
+    :param bbox: 是(n,6)的尺寸，其中第0列代表bbox的分类序号，1~4为bbox坐标信息(xyxy)(均归一化了)，5是bbox的专属类别置信度
+    """
+    img = img.copy()
+    h, w = img.shape[0:2]
+    n = bbox.size()[0]
+    for i in range(n):
+        p1 = (w * bbox[i, 1], h * bbox[i, 2])
+        p2 = (w * bbox[i, 3], h * bbox[i, 4])
+        cls_name = CLASSES[int(bbox[i, 0])]
+        confidence = bbox[i, 5]
+        # p1 = p1.numpy()
+        p1 = (int(p1[0].detach().numpy()), int(p1[1].detach().numpy()))
+        p2 = (400, 400)
+        cv2.rectangle(img, p1, p2, color=COLOR[int(bbox[i, 0])])
+        cv2.putText(img, cls_name, p1, cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
+    # cv2.rectangle(img, (10,10), (100,100), (255,0,0), 2)
+    cv2.imshow("bbox", img)
+    cv2.waitKey(0)
+
+
+def NMS(bbox, conf_thresh=0.1, iou_thresh=0.3):
+    """bbox数据格式是(n,25),前4个是(x1,y1,x2,y2)的坐标信息，第5个是置信度，后20个是类别概率
+    :param conf_thresh: cls-specific confidence score的阈值
+    :param iou_thresh: NMS算法中iou的阈值
+    """
+    n = bbox.size()[0]
+    bbox_prob = bbox[:, 5:].clone()  # 类别预测的条件概率
+    bbox_confi = bbox[:, 4].clone().unsqueeze(1).expand_as(bbox_prob)  # 预测置信度
+    bbox_cls_spec_conf = bbox_confi * bbox_prob  # 置信度*类别条件概率=cls-specific confidence score整合了是否有物体及是什么物体的两种信息
+    bbox_cls_spec_conf[bbox_cls_spec_conf <= conf_thresh] = 0  # 将低于阈值的bbox忽略
+    for c in range(20):
+        rank = torch.sort(bbox_cls_spec_conf[:, c], descending=True).indices
+        for i in range(98):
+            if bbox_cls_spec_conf[rank[i], c] != 0:
+                for j in range(i + 1, 98):
+                    if bbox_cls_spec_conf[rank[j], c] != 0:
+                        iou = calculate_iou(bbox[rank[i], 0:4], bbox[rank[j], 0:4])
+                        if iou > iou_thresh:  # 根据iou进行非极大值抑制抑制
+                            bbox_cls_spec_conf[rank[j], c] = 0
+    bbox = bbox[torch.max(bbox_cls_spec_conf, dim=1).values > 0]  # 将20个类别中最大的cls-specific confidence score为0的bbox都排除
+    bbox_cls_spec_conf = bbox_cls_spec_conf[torch.max(bbox_cls_spec_conf, dim=1).values > 0]
+    res = torch.ones((bbox.size()[0], 6))
+    res[:, 1:5] = bbox[:, 0:4]  # 储存最后的bbox坐标信息
+    res[:, 0] = torch.argmax(bbox[:, 5:], dim=1).int()  # 储存bbox对应的类别信息
+    res[:, 5] = torch.max(bbox_cls_spec_conf, dim=1).values  # 储存bbox对应的class-specific confidence scores
+    return res
+
+
+# 注意检查一下输入数据的格式，到底是xywh还是xyxy
+def labels2bbox(matrix):
+    """
+    将网络输出的7*7*30的数据转换为bbox的(98,25)的格式，然后再将NMS处理后的结果返回
+    :param matrix: 注意，输入的数据中，bbox坐标的格式是(px,py,w,h)，需要转换为(x1,y1,x2,y2)的格式再输入NMS
+    :return: 返回NMS处理后的结果
+    """
+    if matrix.size()[0:2] != (7, 7):
+        raise ValueError("Error: Wrong labels size:", matrix.size())
+    bbox = torch.zeros((98, 25))
+    # 先把7*7*30的数据转变为bbox的(98,25)的格式，其中，bbox信息格式从(px,py,w,h)转换为(x1,y1,x2,y2),方便计算iou
+    for i in range(7):  # i是网格的行方向(y方向)
+        for j in range(7):  # j是网格的列方向(x方向)
+            bbox[2 * (i * 7 + j), 0:4] = torch.Tensor([(matrix[i, j, 0] + j) / 7 - matrix[i, j, 2] / 2,
+                                                       (matrix[i, j, 1] + i) / 7 - matrix[i, j, 3] / 2,
+                                                       (matrix[i, j, 0] + j) / 7 + matrix[i, j, 2] / 2,
+                                                       (matrix[i, j, 1] + i) / 7 + matrix[i, j, 3] / 2])
+            bbox[2 * (i * 7 + j), 4] = matrix[i, j, 4]
+            bbox[2 * (i * 7 + j), 5:] = matrix[i, j, 10:]   #这20个数和下面的20个数是重复的
+            bbox[2 * (i * 7 + j) + 1, 0:4] = torch.Tensor([(matrix[i, j, 5] + j) / 7 - matrix[i, j, 7] / 2,
+                                                           (matrix[i, j, 6] + i) / 7 - matrix[i, j, 8] / 2,
+                                                           (matrix[i, j, 5] + j) / 7 + matrix[i, j, 7] / 2,
+                                                           (matrix[i, j, 6] + i) / 7 + matrix[i, j, 8] / 2])
+            bbox[2 * (i * 7 + j) + 1, 4] = matrix[i, j, 9]
+            bbox[2 * (i * 7 + j) + 1, 5:] = matrix[i, j, 10:]
+    return bbox
+    # return NMS(bbox)  # 对所有98个bbox执行NMS算法，清理cls-specific confidence score较低以及iou重合度过高的bbox
+
+
+def ChangeImageSize(img, inputSize):
+    h, w = img.shape[0:2]
+    # 输入YOLOv1网络的图像尺寸为448x448
+    # 因为数据集内原始图像的尺寸是不定的，所以需要进行适当的padding，将原始图像padding成宽高一致的正方形
+    # 然后再将Padding后的正方形图像缩放成448x448
+    padw, padh = 0, 0  # 要记录宽高方向的padding具体数值，因为padding之后需要调整bbox的位置信息
+    if h > w:
+        padw = (h - w) // 2
+        img = np.pad(img, ((0, 0), (padw, padw), (0, 0)), 'constant', constant_values=0)
+    elif w > h:
+        padh = (w - h) // 2
+        img = np.pad(img, ((padh, padh), (0, 0), (0, 0)), 'constant', constant_values=0)
+    img = cv2.resize(img, (inputSize, inputSize))
 
 
 def convert(size, box):
@@ -254,6 +356,43 @@ def calculate_iou(bbox1, bbox2):
         return area_intersect / (area1 + area2 - area_intersect)  # 计算iou
     else:
         return 0
+
+
+class YOLOv1_resnet(nn.Module):
+    def __init__(self):
+        super(YOLOv1_resnet, self).__init__()
+        resnet = tvmodel.resnet101(pretrained=True)  # 调用torchvision里的resnet34预训练模型
+        resnet_out_channel = resnet.fc.in_features  # 记录resnet全连接层之前的网络输出通道数，方便连入后续卷积网络中
+        self.resnet = nn.Sequential(*list(resnet.children())[:-2])  # 去除resnet的最后两层
+        # 以下是YOLOv1的最后四个卷积层
+        self.Conv_layers = nn.Sequential(
+            nn.Conv2d(resnet_out_channel, 1024, 3, padding=1),
+            nn.BatchNorm2d(1024),  # 为了加快训练，这里增加了BN层，原论文里YOLOv1是没有的
+            nn.LeakyReLU(),
+            nn.Conv2d(1024, 1024, 3, stride=2, padding=1),
+            nn.BatchNorm2d(1024),
+            nn.LeakyReLU(),
+            nn.Conv2d(1024, 1024, 3, padding=1),
+            nn.BatchNorm2d(1024),
+            nn.LeakyReLU(),
+            nn.Conv2d(1024, 1024, 3, padding=1),
+            nn.BatchNorm2d(1024),
+            nn.LeakyReLU(),
+        )
+        # 以下是YOLOv1的最后2个全连接层
+        self.Conn_layers = nn.Sequential(
+            nn.Linear(7 * 7 * 1024, 4096),
+            nn.LeakyReLU(),
+            nn.Linear(4096, 7 * 7 * 30),
+            nn.Sigmoid()  # 增加sigmoid函数是为了将输出全部映射到(0,1)之间，因为如果出现负数或太大的数，后续计算loss会很麻烦
+        )
+
+    def forward(self, input):
+        input = self.resnet(input)
+        input = self.Conv_layers(input)
+        input = input.view(input.size()[0], -1)
+        input = self.Conn_layers(input)
+        return input.reshape(-1, (5 * NUM_BBOX + len(CLASSES)), 7, 7)  # 记住最后要reshape一下输出数据
 
 
 if __name__ == "__main__":
