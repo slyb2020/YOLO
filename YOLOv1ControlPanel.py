@@ -39,7 +39,6 @@ class YOLOv1ControlPanel(wx.Panel):
                                                 choices=self.pretrainedModelList)
         hhbox.Add(self.pretrainedModelCOMBO, 1, wx.RIGHT, 10)
         vbox.Add(hhbox)
-        vbox.Add((-1, 5))
         hhbox = wx.BoxSizer()
         hhbox.Add((8, -1))
         self.startDetectionBTN = wx.Button(self, label="开始检测", size=(100, 30))
