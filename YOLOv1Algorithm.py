@@ -87,6 +87,7 @@ def labels2bbox(matrix):
     for i in range(7):  # i是网格的行方向(y方向)
         for j in range(7):  # j是网格的列方向(x方向)
             bbox[2 * (i * 7 + j), 0:4] = torch.Tensor([(matrix[i, j, 0] + j) / 7 - matrix[i, j, 2] / 2,
+                                                       #px,py是相对于自己格子左上顶点的距离占格子的比例，而w,h确实相对整个图片的
                                                        (matrix[i, j, 1] + i) / 7 - matrix[i, j, 3] / 2,
                                                        (matrix[i, j, 0] + j) / 7 + matrix[i, j, 2] / 2,
                                                        (matrix[i, j, 1] + i) / 7 + matrix[i, j, 3] / 2])

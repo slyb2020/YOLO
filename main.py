@@ -11,7 +11,7 @@ VERSION_STRING = "20220211A"
 class FlatMenuFrame(wx.Frame):
     def __init__(self, parent):
         # 如果要初始运行时最大化可以或上wx.MAXIMIZE
-        wx.Frame.__init__(self, parent, size=(1500, 900), style=wx.DEFAULT_FRAME_STYLE | wx.NO_FULL_REPAINT_ON_RESIZE)
+        wx.Frame.__init__(self, parent, size=(1600, 900), style=wx.DEFAULT_FRAME_STYLE | wx.NO_FULL_REPAINT_ON_RESIZE)
         self.SetIcon(images.Mondrian.GetIcon())
         self.SetTitle("基于YOLO的目标检测系统   Version——0.%s" % VERSION_STRING)
         self._popUpMenu = None

@@ -32,7 +32,7 @@ class YOLOv1Panel(wx.Panel):
         self.datasetTree = DatasetTree(self, self.log, size=(180, 300), wantedList=['DETECTION'])
         self.listDataPanel = ListDataPanel(self, self.log, [])
         self.middlePanel = YOLOPictureShowPanel(self, self.log, size=(630, -1), gap=True)
-        self.rightPanel = YOLOv1ControlPanel(self, self.log, size=(300, -1))
+        self.rightPanel = YOLOv1ControlPanel(self, self.log, size=(340, -1))
         hbox = wx.BoxSizer()
         vvbox = wx.BoxSizer(wx.VERTICAL)
         vvbox.Add(self.editDatasetBTN, 0)
@@ -78,7 +78,12 @@ class YOLOv1Panel(wx.Panel):
         self.rightPanel.spendTimeTXT.SetValue("%.4f毫秒" % ((endTime - startTime) * 1000))
         self.pred = np.squeeze(self.pred)
         self.pred = self.pred.permute((1, 2, 0))
-        self.middlePanel.bbox = labels2bbox(self.pred)
+        print(self.pred.shape)
+        for i in range(7):
+            for j in range(7):
+                print(i, j, self.pred[i,j,:])
+        self.middlePanel.bbox =  labels2bbox(self.pred)
+        print(self.middlePanel.bbox.shape)
         self.middlePanel.BBOX = NMS(self.middlePanel.bbox)
         self.middlePanel.Refresh()
 
