@@ -5,8 +5,8 @@ from ID_DEFINE import *
 import torch.nn as nn
 from YOLOv1Algorithm import YOLOv1_resnet
 
-
 VERSION_STRING = "20220211A"
+
 
 class FlatMenuFrame(wx.Frame):
     def __init__(self, parent):
@@ -156,14 +156,9 @@ class FlatMenuFrame(wx.Frame):
         dlg.Destroy()
 
 
-def main():
+if __name__ == '__main__':
     app = wx.App()
     win = FlatMenuFrame(None)
     win.Show()
     win.Center(wx.BOTH)
     app.MainLoop()
-
-
-if __name__ == '__main__':
-    __name__ = 'Main'
-    main()

@@ -1,20 +1,89 @@
 <annotation>
 	<Dataset>
-		<name>猫狗大战</name>
+		<name>Caltech</name>
 		<SubDataset>
-			<name>2007</name>
-					<GrandDataset>
-						<name>检测数据集</name>
-						<type>DETECTION</type>
-						<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
-					</GrandDataset>
-					<GrandDataset>
-						<name>识别数据集</name>
-						<type>RECOGNITION</type>
-						<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
-					</GrandDataset>
+			<name>检测数据集</name>
+			<type>DETECTION</type>
+			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
 		</SubDataset>
 	</Dataset>
+	<Dataset>
+		<name>CelebA</name>
+		<SubDataset>
+			<name>检测数据集</name>
+			<type>DETECTION</type>
+			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
+		</SubDataset>
+		<SubDataset>
+			<name>识别数据集</name>
+			<type>RECOGNITION</type>
+			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
+		</SubDataset>
+	</Dataset>
+	<Dataset>
+		<name>CIFAR</name>
+		<SubDataset>
+			<name>检测数据集</name>
+			<type>DETECTION</type>
+			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
+		</SubDataset>
+		<SubDataset>
+			<name>识别数据集</name>
+			<type>RECOGNITION</type>
+			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
+		</SubDataset>
+	</Dataset>
+	<Dataset>
+		<name>Cityscapes</name>
+		<SubDataset>
+			<name>检测数据集</name>
+			<type>DETECTION</type>
+			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
+		</SubDataset>
+		<SubDataset>
+			<name>识别数据集</name>
+			<type>RECOGNITION</type>
+			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
+		</SubDataset>
+	</Dataset>
+	<Dataset>
+		<name>COCO</name>
+		<SubDataset>
+			<name>检测数据集</name>
+			<type>DETECTION</type>
+			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
+		</SubDataset>
+	</Dataset>
+	<Dataset>
+		<name>EMNIST</name>
+		<SubDataset>
+			<name>检测数据集</name>
+			<type>DETECTION</type>
+			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
+		</SubDataset>
+	</Dataset>
+	<Dataset>
+		<name>FakeData</name>
+		<SubDataset>
+			<name>检测数据集</name>
+			<type>DETECTION</type>
+			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
+		</SubDataset>
+	</Dataset>
+	<Dataset>
+		<name>Fashion-MNIST</name>
+		<SubDataset>
+			<name>检测数据集</name>
+			<type>DETECTION</type>
+			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
+		</SubDataset>
+	</Dataset>
+
+
+
+
+
+
 	<Dataset>
 		<name>FashionMNIST</name>
 		<SubDataset>
