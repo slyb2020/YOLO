@@ -25,18 +25,26 @@ def GetDatasetInfo():  # 解析DatasetInformation.xml文件，获取本地所有
     tree = ET.parse(inputFilename)
     root = tree.getroot()
     for obj in root.iter('Dataset'):
-        datasetName = obj.find('name').text
         subList = []
-        for subSet in obj.iter('SubDataset'):
-            subDatasetName = subSet.find('name').text
-            grandList = []
-            for grandSet in subSet.iter('GrandDataset'):
-                grandDatasetName = grandSet.find('name').text
-                grandDatasetType = grandSet.find('type').text
-                grandDatasetDir = grandSet.find('dir').text
-                grandList.append([grandDatasetName, grandDatasetType, grandDatasetDir])
-            subList.append([subDatasetName, grandList])
-        result.append([datasetName, subList])
+        datasetName = obj.find('name').text
+        datasetLayer = obj.find('layer').text
+        datasetType = obj.find('type').text
+        datasetDir = obj.find('dir').text
+        if datasetLayer != "0":
+            for subSet in obj.iter('SubDataset'):
+                grandList = []
+                subDatasetName = subSet.find('name').text
+                subDatasetLayer = subSet.find('layer').text
+                subDatasetType = subSet.find('type').text
+                subDatasetDir = subSet.find('dir').text
+                if subDatasetLayer != "0":
+                    for grandSet in subSet.iter('GrandDataset'):
+                        grandDatasetName = grandSet.find('name').text
+                        grandDatasetType = grandSet.find('type').text
+                        grandDatasetDir = grandSet.find('dir').text
+                        grandList.append([grandDatasetName, grandDatasetType, grandDatasetDir])
+                subList.append([subDatasetName, subDatasetLayer, subDatasetType, subDatasetDir, grandList])
+        result.append([datasetName,datasetLayer, datasetType, datasetDir, subList])
     return result
 
 
@@ -54,7 +62,7 @@ class MyTreeCtrl(wx.TreeCtrl):
         return 1
 
 
-class DatasetTree(wx.Panel):
+class DatasetTreePanel(wx.Panel):
     def __init__(self, parent, log, size, wantedList=['DETECTION', 'RECOGNITION']):
         # Use the WANTS_CHARS style so the panel doesn't eat the Return key.
         wx.Panel.__init__(self, parent, -1, size, style=wx.BORDER_THEME)
@@ -85,27 +93,7 @@ class DatasetTree(wx.Panel):
         # smileidx    = il.Add(images.Smiles.GetBitmap())
         self.tree.SetImageList(il)
         self.il = il
-        self.root = self.tree.AddRoot("数据集")
-        self.tree.SetItemData(self.root, "根")
-        self.tree.SetItemImage(self.root, fldridx, wx.TreeItemIcon_Normal)
-        self.tree.SetItemImage(self.root, fldropenidx, wx.TreeItemIcon_Expanded)
-        for i in datasetList:
-            child = self.tree.AppendItem(self.root, i[0])
-            self.tree.SetItemData(child, "集")
-            self.tree.SetItemImage(child, fldridx, wx.TreeItemIcon_Normal)
-            self.tree.SetItemImage(child, fldropenidx, wx.TreeItemIcon_Expanded)
-            for j in i[1]:
-                last = self.tree.AppendItem(child, j[0])
-                self.tree.SetItemData(last, "子集")
-                self.tree.SetItemImage(last, fldridx, wx.TreeItemIcon_Normal)
-                self.tree.SetItemImage(last, fldropenidx, wx.TreeItemIcon_Expanded)
-                for k in j[1]:
-                    if k[1] in self.wantedList:
-                        item = self.tree.AppendItem(last, k[0])
-                        self.tree.SetItemData(item, "孙集" + k[2])
-                        self.tree.SetItemImage(item, fileidx, wx.TreeItemIcon_Normal)
-                        self.tree.SetItemImage(item, smileidx, wx.TreeItemIcon_Selected)
-        self.tree.ExpandAll()
+        self.ReCreateTree()
         self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.OnBeginEdit, self.tree)
         self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.OnEndEdit, self.tree)
 
@@ -120,6 +108,7 @@ class DatasetTree(wx.Panel):
         event.Veto()
 
     def ReCreateTree(self):
+        datasetList = GetDatasetInfo()
         self.tree.Destroy()
         tID = wx.NewIdRef()
         self.tree = MyTreeCtrl(self, tID, wx.DefaultPosition, (200, 900),
@@ -140,23 +129,32 @@ class DatasetTree(wx.Panel):
         self.tree.SetItemData(self.root, "根")
         self.tree.SetItemImage(self.root, fldridx, wx.TreeItemIcon_Normal)
         self.tree.SetItemImage(self.root, fldropenidx, wx.TreeItemIcon_Expanded)
-        for i in self.master.department_list:
+        for i in datasetList:
             child = self.tree.AppendItem(self.root, i[0])
-            self.tree.SetItemData(child, "集")
-            self.tree.SetItemImage(child, fldridx, wx.TreeItemIcon_Normal)
-            self.tree.SetItemImage(child, fldropenidx, wx.TreeItemIcon_Expanded)
-            for j in i[1]:
-                last = self.tree.AppendItem(child, j[0])
-                self.tree.SetItemData(last, "子集")
-                self.tree.SetItemImage(last, fldridx, wx.TreeItemIcon_Normal)
-                self.tree.SetItemImage(last, fldropenidx, wx.TreeItemIcon_Expanded)
-                for k in j[1]:
-                    item = self.tree.AppendItem(last, k[0])
-                    self.tree.SetItemData(item, "孙集")
-                    self.tree.SetItemImage(item, fileidx, wx.TreeItemIcon_Normal)
-                    self.tree.SetItemImage(item, smileidx, wx.TreeItemIcon_Selected)
-        self.tree.ExpandAll()
-        # self.tree.Refresh()
+            self.tree.SetItemData(child,"主集," + str(i[0]) + ',' + str(i[1]) + ',' + str(i[2]) + ',' + str(i[3]))
+            if i[1] != '0':
+                self.tree.SetItemImage(child, fldridx, wx.TreeItemIcon_Normal)
+                self.tree.SetItemImage(child, fldropenidx, wx.TreeItemIcon_Expanded)
+                for j in i[4]:
+                    last = self.tree.AppendItem(child, j[0])
+                    self.tree.SetItemData(last, "子集," + i[0] + ',' + j[0] + ',' + j[1] + ',' + j[2] + ',' + j[3])
+                    if j[1] != '0':
+                        self.tree.SetItemImage(last, fldridx, wx.TreeItemIcon_Normal)
+                        self.tree.SetItemImage(last, fldropenidx, wx.TreeItemIcon_Expanded)
+                        for k in j[4]:
+                            if k[3] in self.wantedList:
+                                item = self.tree.AppendItem(last, k[0])
+                                self.tree.SetItemData(item, "孙集," + i[0] + ',' + j[0] + ',' + k[0] + ',' + k[1] + ',' + k[2])
+                                self.tree.SetItemImage(item, fileidx, wx.TreeItemIcon_Normal)
+                                self.tree.SetItemImage(item, smileidx, wx.TreeItemIcon_Selected)
+                    else:
+                        self.tree.SetItemImage(last, fileidx, wx.TreeItemIcon_Normal)
+                        self.tree.SetItemImage(last, smileidx, wx.TreeItemIcon_Expanded)
+            else:
+                self.tree.SetItemImage(child, fileidx, wx.TreeItemIcon_Normal)
+                self.tree.SetItemImage(child, smileidx, wx.TreeItemIcon_Expanded)
+        self.tree.CollapseAll()
+        self.tree.Expand(self.root)
 
 
 if __name__ == "__main__":

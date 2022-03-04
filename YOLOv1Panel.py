@@ -2,7 +2,7 @@ import copy
 import os
 import wx
 import images
-from DatasetTree import DatasetTree
+from DatasetTreePanel import DatasetTreePanel
 from ListDataPanel import ListDataPanel
 from PictureShowPanel import PictureShowPanel
 import xml.etree.ElementTree as ET
@@ -29,7 +29,7 @@ class YOLOv1Panel(wx.Panel):
         self.log = log
         self.datasetDir = None
         self.editDatasetBTN = wx.Button(self, -1, label="编辑数据集", size=(180, 35))
-        self.datasetTree = DatasetTree(self, self.log, size=(180, 300), wantedList=['DETECTION'])
+        self.datasetTree = DatasetTreePanel(self, self.log, size=(180, 300), wantedList=['DETECTION'])
         self.listDataPanel = ListDataPanel(self, self.log, [])
         self.middlePanel = YOLOPictureShowPanel(self, self.log, size=(630, -1), gap=True)
         self.rightPanel = YOLOv1ControlPanel(self, self.log, size=(340, -1))

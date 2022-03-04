@@ -1,138 +1,153 @@
 <annotation>
 	<Dataset>
 		<name>Caltech</name>
+		<layer>1</layer>
+		<type></type>
+		<dir>D:\WorkSpace\DataSet\Caltech</dir>
 		<SubDataset>
-			<name>检测数据集</name>
-			<type>DETECTION</type>
-			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
+			<name>Caltech101</name>
+			<layer>0</layer>
+			<type>识别数据集</type>
+			<dir>D:\WorkSpace\DataSet\Caltech\caltech101</dir>
+		</SubDataset>
+		<SubDataset>
+			<name>Caltech256</name>
+			<layer>0</layer>
+			<type>识别数据集</type>
+			<dir>D:\WorkSpace\DataSet\Caltech\caltech256</dir>
 		</SubDataset>
 	</Dataset>
 	<Dataset>
 		<name>CelebA</name>
+		<layer>0</layer>
+		<type></type>
+		<dir>'D:\WorkSpace\DataSet\Caltech'</dir>
 		<SubDataset>
 			<name>检测数据集</name>
+			<layer>0</layer>
 			<type>DETECTION</type>
 			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
 		</SubDataset>
 		<SubDataset>
 			<name>识别数据集</name>
+			<layer>0</layer>
 			<type>RECOGNITION</type>
 			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
 		</SubDataset>
 	</Dataset>
 	<Dataset>
 		<name>CIFAR</name>
+		<layer>0</layer>
+		<type></type>
+		<dir>'D:\WorkSpace\DataSet\Caltech'</dir>
 		<SubDataset>
 			<name>检测数据集</name>
+			<layer>0</layer>
 			<type>DETECTION</type>
 			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
 		</SubDataset>
 		<SubDataset>
 			<name>识别数据集</name>
+			<layer>0</layer>
 			<type>RECOGNITION</type>
 			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
 		</SubDataset>
 	</Dataset>
 	<Dataset>
 		<name>Cityscapes</name>
+		<layer>0</layer>
+		<type></type>
+		<dir>'D:\WorkSpace\DataSet\Caltech'</dir>
 		<SubDataset>
 			<name>检测数据集</name>
+			<layer>0</layer>
 			<type>DETECTION</type>
 			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
 		</SubDataset>
 		<SubDataset>
 			<name>识别数据集</name>
+			<layer>0</layer>
 			<type>RECOGNITION</type>
 			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
 		</SubDataset>
 	</Dataset>
 	<Dataset>
 		<name>COCO</name>
+		<layer>0</layer>
+		<type></type>
+		<dir>'D:\WorkSpace\DataSet\Caltech'</dir>
 		<SubDataset>
 			<name>检测数据集</name>
+			<layer>0</layer>
 			<type>DETECTION</type>
 			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
 		</SubDataset>
 	</Dataset>
 	<Dataset>
 		<name>EMNIST</name>
+		<layer>0</layer>
+		<type></type>
+		<dir>'D:\WorkSpace\DataSet\Caltech'</dir>
 		<SubDataset>
 			<name>检测数据集</name>
+			<layer>0</layer>
 			<type>DETECTION</type>
 			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
 		</SubDataset>
 	</Dataset>
 	<Dataset>
 		<name>FakeData</name>
+		<layer>0</layer>
+		<type></type>
+		<dir>'D:\WorkSpace\DataSet\Caltech'</dir>
 		<SubDataset>
 			<name>检测数据集</name>
+			<layer>0</layer>
 			<type>DETECTION</type>
 			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
 		</SubDataset>
 	</Dataset>
 	<Dataset>
 		<name>Fashion-MNIST</name>
+		<layer>0</layer>
+		<type></type>
+		<dir>'D:\WorkSpace\DataSet\Caltech'</dir>
 		<SubDataset>
 			<name>检测数据集</name>
+			<layer>0</layer>
 			<type>DETECTION</type>
 			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
 		</SubDataset>
 	</Dataset>
-
-
-
-
-
-
 	<Dataset>
-		<name>FashionMNIST</name>
+		<name>ImageNet</name>
+		<layer>0</layer>
+		<type></type>
+		<dir>'D:\WorkSpace\DataSet\Caltech'</dir>
+		<havesub>yes</havesub>
 		<SubDataset>
-			<name>2007</name>
-					<GrandDataset>
-						<name>Detection</name>
-						<type>RECOGNITION</type>
-						<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
-					</GrandDataset>
+			<name>训练集</name>
+			<layer>0</layer>
+			<type>DETECTION</type>
+			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
 		</SubDataset>
 	</Dataset>
 	<Dataset>
 		<name>MNIST</name>
+		<layer>1</layer>
+		<type>识别数据集</type>
+		<dir>D:\WorkSpace\DataSet\</dir>
 		<SubDataset>
-			<name>2007</name>
-					<GrandDataset>
-						<name>Detection</name>
-						<type>DETECTION</type>
-						<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
-					</GrandDataset>
+			<name>训练数据集</name>
+			<layer>0</layer>
+			<type>DETECTION</type>
+			<dir>D:\WorkSpace\DataSet\</dir>
 		</SubDataset>
 		<SubDataset>
-			<name>2012</name>
-					<GrandDataset>
-						<name>检测数据集</name>
-						<type>DETECTION</type>
-						<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012\JPEGImages</dir>
-					</GrandDataset>
-					<GrandDataset>
-						<name>识别数据集</name>
-						<type>RECOGNITION</type>
-						<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
-					</GrandDataset>
-					<GrandDataset>
-						<name>分割数据集</name>
-						<type>SEGMENTATION</type>
-						<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
-					</GrandDataset>
-		</SubDataset>
-	</Dataset>
-	<Dataset>
-		<name>ImageNet</name>
-		<SubDataset>
-			<name>2007</name>
-					<GrandDataset>
-						<name>Detection</name>
-						<type>DETECTION</type>
-						<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
-					</GrandDataset>
+			<name>测试数据集</name>
+			<layer>0</layer>
+			<type>DETECTION</type>
+			<dir>D:\WorkSpace\DataSet\</dir>
 		</SubDataset>
 	</Dataset>
 </annotation>
