@@ -13,7 +13,7 @@ import cv2
 from ID_DEFINE import *
 from DatasetLabelProcess import *
 import wx.lib.scrolledpanel as scrolled
-from torchvision.datasets import Caltech101,Caltech256
+from torchvision.datasets import CIFAR10,CIFAR100
 import numpy as np
 
 
@@ -22,12 +22,12 @@ class DatasetButtonShowPanel(scrolled.ScrolledPanel):
         scrolled.ScrolledPanel.__init__(self, parent, -1)
         self.parent = parent
         self.log = log
-        self.height = 80
-        self.width = 80
+        self.height = 50
+        self.width = 50
         wsizer = wx.WrapSizer(orient=wx.HORIZONTAL)
         self.buttonIdList = []
         self.buttonFilenameList = []
-        for _ in range(1000):
+        for _ in range(198):
             image, label = dataset.__next__()
             image = np.array(image)
             a = image.shape[0]
@@ -43,7 +43,7 @@ class DatasetButtonShowPanel(scrolled.ScrolledPanel):
         self.SetAutoLayout(1)
         self.SetupScrolling()
 
-class Caltech101Panel(wx.Panel):
+class CIFAR10Panel(wx.Panel):
     def __init__(self, parent, master, log):
         wx.Panel.__init__(self, parent)
         self.log = log
@@ -66,17 +66,17 @@ class Caltech101Panel(wx.Panel):
         idx5 = il.Add(images._rt_save.GetBitmap())
         idx6 = il.Add(images._rt_redo.GetBitmap())
         hbox = wx.BoxSizer()
-        a = Caltech101(self.master.datasetProperty[-1])
-        dataset = iter(a)
-        self.pepoleClassPanel = DatasetButtonShowPanel(self.notebook, dataset, self.log)
-        self.notebook.AddPage(self.pepoleClassPanel, "人脸数据")
-        # self.caltech256Panel = Caltech256Panel(self.notebook, self.master, self.log)
-        # self.notebook.AddPage(self.testSetPanel, "测试集")
+        self.trainDataset = iter(CIFAR10(self.master.datasetProperty[-1]+'CIFAR10',train=True))
+        self.testDataset = iter(CIFAR10(self.master.datasetProperty[-1]+'CIFAR10',train=False))
+        self.trainDatasetPanel = DatasetButtonShowPanel(self.notebook, self.trainDataset, self.log)
+        self.notebook.AddPage(self.trainDatasetPanel, "训练数据集")
+        self.testDatasetPanel = DatasetButtonShowPanel(self.notebook, self.testDataset, self.log)
+        self.notebook.AddPage(self.testDatasetPanel, "测试数据集")
         hbox.Add(self.notebook, 1, wx.EXPAND)
         self.SetSizer(hbox)
 
 
-class Caltech256Panel(wx.Panel):
+class CIFAR100Panel(wx.Panel):
     def __init__(self, parent, master, log):
         wx.Panel.__init__(self, parent)
         self.log = log
@@ -99,7 +99,7 @@ class Caltech256Panel(wx.Panel):
         idx5 = il.Add(images._rt_save.GetBitmap())
         idx6 = il.Add(images._rt_redo.GetBitmap())
         hbox = wx.BoxSizer()
-        for i in range(10):
+        for i in range(2):
             self.notebook.AddPage(wx.Panel(self.notebook),"分类%d"%(i))
             # self.datasetIntroductionPanel = wx.Panel(self.notebook)
             # self.notebook.AddPage(self.datasetIntroductionPanel, "数据集介绍")
@@ -111,7 +111,7 @@ class Caltech256Panel(wx.Panel):
         self.SetSizer(hbox)
 
 
-class CaltechPanel(wx.Panel):
+class CIFARPanel(wx.Panel):
     def __init__(self, parent, master, log):
         wx.Panel.__init__(self, parent)
         self.log = log
@@ -139,18 +139,18 @@ class CaltechPanel(wx.Panel):
         idx6 = il.Add(images._rt_redo.GetBitmap())
         hbox = wx.BoxSizer()
         self.datasetIntroductionPanel = wx.Panel(self.notebook)
-        self.notebook.AddPage(self.datasetIntroductionPanel, "Caltech数据集介绍")
-        self.caltech101Panel = Caltech101Panel(self.notebook, self.master, self.log)
-        self.notebook.AddPage(self.caltech101Panel, "Caltech101")
-        self.caltech256Panel = Caltech256Panel(self.notebook, self.master, self.log)
-        self.notebook.AddPage(self.caltech256Panel, "Caltech256")
+        self.notebook.AddPage(self.datasetIntroductionPanel, "CIFAR数据集介绍")
+        self.cifar10Panel = CIFAR10Panel(self.notebook, self.master, self.log)
+        self.notebook.AddPage(self.cifar10Panel, "CIFAR10")
+        self.cifar100Panel = CIFAR100Panel(self.notebook, self.master, self.log)
+        self.notebook.AddPage(self.cifar100Panel, "CIFAR100")
         hbox.Add(self.notebook, 1, wx.EXPAND)
         self.SetSizer(hbox)
         self.Bind(wx.EVT_BUTTON, self.OnPictureButton)
         if self.master.datasetProperty[0] == "主集":
             self.notebook.SetSelection(0)
         elif self.master.datasetProperty[0] == "子集":
-            if self.master.datasetProperty[2] == "Caltech101":
+            if self.master.datasetProperty[2] == "CIFAR10":
                 self.notebook.SetSelection(1)
             else:
                 self.notebook.SetSelection(2)

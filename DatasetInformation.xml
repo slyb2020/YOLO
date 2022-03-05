@@ -8,13 +8,13 @@
 			<name>Caltech101</name>
 			<layer>0</layer>
 			<type>识别数据集</type>
-			<dir>D:\WorkSpace\DataSet\Caltech\caltech101</dir>
+			<dir>D:\WorkSpace\DataSet\Caltech\</dir>
 		</SubDataset>
 		<SubDataset>
 			<name>Caltech256</name>
 			<layer>0</layer>
 			<type>识别数据集</type>
-			<dir>D:\WorkSpace\DataSet\Caltech\caltech256</dir>
+			<dir>D:\WorkSpace\DataSet\Caltech\</dir>
 		</SubDataset>
 	</Dataset>
 	<Dataset>
@@ -37,20 +37,20 @@
 	</Dataset>
 	<Dataset>
 		<name>CIFAR</name>
-		<layer>0</layer>
+		<layer>1</layer>
 		<type></type>
-		<dir>'D:\WorkSpace\DataSet\Caltech'</dir>
+		<dir>D:\WorkSpace\DataSet\</dir>
 		<SubDataset>
-			<name>检测数据集</name>
+			<name>CIFAR10</name>
 			<layer>0</layer>
 			<type>DETECTION</type>
-			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
+			<dir>D:\WorkSpace\DataSet\</dir>
 		</SubDataset>
 		<SubDataset>
-			<name>识别数据集</name>
+			<name>CIFAR100</name>
 			<layer>0</layer>
 			<type>RECOGNITION</type>
-			<dir>D:\WorkSpace\DataSet\VOCtrainval_11-May-2012\VOCdevkit\VOC2012</dir>
+			<dir>D:\WorkSpace\DataSet\</dir>
 		</SubDataset>
 	</Dataset>
 	<Dataset>

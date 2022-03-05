@@ -12,7 +12,7 @@ from DatasetLabelProcess import *
 import wx.lib.scrolledpanel as scrolled
 from MNISTPanel import MNISTPanel
 from CaltechPanel import CaltechPanel
-
+from CIFARPanel import CIFARPanel
 
 class DatasetOperationPanel(wx.Panel):
     def __init__(self, parent, log):
@@ -57,6 +57,8 @@ class DatasetOperationPanel(wx.Panel):
                     self.datasetShowPanel = MNISTPanel(self.datasetTempPanel, self, self.log)
                 elif self.datasetProperty[1] == "Caltech":
                     self.datasetShowPanel = CaltechPanel(self.datasetTempPanel, self, self.log)
+                elif self.datasetProperty[1] == "CIFAR":
+                    self.datasetShowPanel = CIFARPanel(self.datasetTempPanel, self, self.log)
                 else:
                     self.datasetShowPanel = wx.Panel(self.datasetTempPanel)
                 sizer = wx.BoxSizer()
@@ -74,6 +76,13 @@ class DatasetOperationPanel(wx.Panel):
                     if self.datasetProperty[2] == "Caltech101":
                         self.datasetShowPanel.notebook.SetSelection(1)
                     elif self.datasetProperty[2] == "Caltech256":
+                        self.datasetShowPanel.notebook.SetSelection(2)
+                    else:
+                        self.datasetShowPanel.notebook.SetSelection(0)
+                elif self.datasetProperty[1] == "CIFAR":
+                    if self.datasetProperty[2] == "CIFAR10":
+                        self.datasetShowPanel.notebook.SetSelection(1)
+                    elif self.datasetProperty[2] == "CIFAR100":
                         self.datasetShowPanel.notebook.SetSelection(2)
                     else:
                         self.datasetShowPanel.notebook.SetSelection(0)
