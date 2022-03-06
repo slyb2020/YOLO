@@ -37,6 +37,7 @@ from wx.lib.agw.fmresources import FM_OPT_SHOW_CUSTOMIZE, FM_OPT_SHOW_TOOLBAR, F
 import datetime
 from DatasetOperationPanel import DatasetOperationPanel
 from YOLOv1Panel import YOLOv1Panel
+from LeNetPanel import LeNetPanel
 
 dirName = os.path.dirname(os.path.abspath(__file__))
 bitmapDir = os.path.join(dirName, 'bitmaps')
@@ -287,6 +288,8 @@ class MainPanel(wx.Panel):
             self.work_zone_Panel.notebook.SetSelection(0)
         if id == ID_YOLOv1_BTN:
             self.work_zone_Panel.notebook.SetSelection(1)
+        if id == ID_LeNet_BTN:
+            self.work_zone_Panel.notebook.SetSelection(2)
 
     def OnSize(self, event):
         wx.adv.LayoutAlgorithm().LayoutWindow(self, self.work_zone_Panel)
@@ -320,14 +323,15 @@ class MainPanel(wx.Panel):
         self.datasetOperationrBTN = AB.AquaButton(panel, ID_DATASET_BTN, bitmap, "数据集操作", size=(100, 50))
         self.datasetOperationrBTN.SetForegroundColour(wx.BLACK)
         self.datasetOperationrBTN.Enable(True)
-        self.YOLOv1rBTN = AB.AquaButton(panel, ID_YOLOv1_BTN, bitmap, "YOLOv1", size=(100, 50))
-        self.YOLOv1rBTN.SetForegroundColour(wx.BLACK)
-        self.LeNet5BTN = AB.AquaButton(panel, ID_YOLOv1_BTN, bitmap, "YOLOv1", size=(100, 50))
-        self.LeNet5BTN.SetForegroundColour(wx.BLACK)
+        self.YOLOv1BTN = AB.AquaButton(panel, ID_YOLOv1_BTN, bitmap, "YOLOv1", size=(100, 50))
+        self.YOLOv1BTN.SetForegroundColour(wx.BLACK)
+        self.LeNetBTN = AB.AquaButton(panel, ID_LeNet_BTN, bitmap, "LeNet", size=(100, 50))
+        self.LeNetBTN.SetForegroundColour(wx.BLACK)
         static = wx.StaticLine(panel, -1)
         vbox = wx.BoxSizer(wx.VERTICAL)
         vbox.Add(self.datasetOperationrBTN, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
-        vbox.Add(self.YOLOv1rBTN, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
+        vbox.Add(self.YOLOv1BTN, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
+        vbox.Add(self.LeNetBTN, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
         vbox.Add(static, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
         panel.SetSizer(vbox)
         self._pnl.AddFoldPanelWindow(item, panel, fpb.FPB_ALIGN_WIDTH, 5, 0)
@@ -362,4 +366,6 @@ class WorkZonePanel(wx.Panel):
         self.notebook.AddPage(self.datasetOperationPNL, "数据集操作面板")
         self.yolov1PNL = YOLOv1Panel(self.notebook, self.log)
         self.notebook.AddPage(self.yolov1PNL, "YOLOv1面板")
+        self.leNetPNL = LeNetPanel(self.notebook, self.log)
+        self.notebook.AddPage(self.leNetPNL, "LeNet面板")
         self.SetSizer(hbox)
