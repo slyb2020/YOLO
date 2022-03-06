@@ -322,6 +322,8 @@ class MainPanel(wx.Panel):
         self.datasetOperationrBTN.Enable(True)
         self.YOLOv1rBTN = AB.AquaButton(panel, ID_YOLOv1_BTN, bitmap, "YOLOv1", size=(100, 50))
         self.YOLOv1rBTN.SetForegroundColour(wx.BLACK)
+        self.LeNet5BTN = AB.AquaButton(panel, ID_YOLOv1_BTN, bitmap, "YOLOv1", size=(100, 50))
+        self.LeNet5BTN.SetForegroundColour(wx.BLACK)
         static = wx.StaticLine(panel, -1)
         vbox = wx.BoxSizer(wx.VERTICAL)
         vbox.Add(self.datasetOperationrBTN, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
