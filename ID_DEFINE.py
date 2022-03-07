@@ -37,6 +37,12 @@ ID_WINDOW_BOTTOM = wx.NewId()
 ID_DATASET_BTN = wx.NewId()
 ID_YOLOv1_BTN = wx.NewId()
 ID_LeNet_BTN = wx.NewId()
+
+
+LeNetModelList = ["LeNet","LeeNet"]
+
+
+
 CLASSES = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep',
            'airplane', 'bicycle', 'boat', 'bus', 'car', 'motobike', 'train',
            'bottle', 'chair', 'dining table', 'potted plant', 'sofa', 'tvmonitor']

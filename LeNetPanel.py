@@ -1,57 +1,44 @@
-import copy
 import os
+
 import wx
+
 import images
-from DatasetTreePanel import DatasetTreePanel
-from ListDataPanel import ListDataPanel
-import xml.etree.ElementTree as ET
-import os
-import cv2
-from ID_DEFINE import *
 from DatasetLabelProcess import *
-from PictureShowPanel import YOLOPictureShowPanel
-from YOLOv1ControlPanel import YOLOv1ControlPanel
-import torch.nn.functional as F
-import torch.optim as optim
-from torch.utils.tensorboard import SummaryWriter
-from tqdm import tqdm  # python的进度条模块
-import torch
-import torchvision.transforms as transforms
-import time
-import numpy as np
 from YOLOv1Algorithm import *
 import wx.lib.scrolledpanel as scrolled
 # from MNIST_Dataset import testDataset
 from torchvision.datasets import MNIST
-from torch.utils.data import DataLoader
-from PIL import Image
+from errorDataFinder import ErrorTest
+from ID_DEFINE import *
 
-
-LeNetModelList = ["原始LeNet模型","改进LeNet模型","LeeNet模型"]
 
 testDataset = MNIST(root="D:\\WorkSpace\\DataSet", train=False)
 
 class ErrorPicPanel(scrolled.ScrolledPanel):
-    def __init__(self, parent):
+    def __init__(self, parent, data=[]):
         scrolled.ScrolledPanel.__init__(self, parent, -1)
         # x, y = self.GetClientSize()
+        self.data = data
+        self.ReCreate()
+    def ReCreate(self):
+        self.DestroyChildren()
         x, y = 45,45
         hbox = wx.BoxSizer()
-        for i in range(1):
-            btn = wx.Button(self, size=(y,y))
-            img, label = testDataset[i]
-            img = np.array(img)
-            self.img = np.zeros((28,28,3),dtype=np.int8)
-            self.img[:,:,0]=img
-            self.img[:,:,1]=img
-            self.img[:,:,2]=img
-            # self.img = cv2.imread("D:\\WorkSpace\\DataSet\\DogCat\\train\\cat.38.jpg")
-            # self.img = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
-            self.width, self.height = self.img.shape[1], self.img.shape[0]
-            bmp = wx.Image(self.width, self.height, self.img).Scale(width=y, height=y,
-                                            quality=wx.IMAGE_QUALITY_BOX_AVERAGE).ConvertToBitmap()
-            btn.SetBitmap(bmp)
-            hbox.Add(btn,0)
+        if len(self.data) > 0:
+            for index, label in self.data:
+                btn = wx.Button(self, size=(y,y))
+                btn.SetToolTip(str(label))
+                img, label = testDataset[index]
+                img = np.array(img)
+                self.img = np.zeros((28,28,3),dtype=np.int8)
+                self.img[:,:,0]=img
+                self.img[:,:,1]=img
+                self.img[:,:,2]=img
+                self.width, self.height = self.img.shape[1], self.img.shape[0]
+                bmp = wx.Image(self.width, self.height, self.img).Scale(width=y, height=y,
+                                                quality=wx.IMAGE_QUALITY_BOX_AVERAGE).ConvertToBitmap()
+                btn.SetBitmap(bmp)
+                hbox.Add(btn,0)
         self.SetSizer(hbox)
         self.SetAutoLayout(1)
         self.SetupScrolling()
@@ -61,7 +48,7 @@ class LeNetMNISTPanel(wx.Panel):
     def __init__(self, parent,  log):
         wx.Panel.__init__(self, parent)
         self.log = log
-        self.leftPanel = wx.Panel(self, size=(220,-1), style=wx.BORDER_THEME)
+        self.leftPanel = wx.Panel(self, size=(340,-1), style=wx.BORDER_THEME)
         self.middlePanel = wx.Panel(self, size=(300,-1))
         self.rightPanel = wx.Panel(self, size=(800,-1), style=wx.BORDER_THEME)
         hbox = wx.BoxSizer()
@@ -74,16 +61,22 @@ class LeNetMNISTPanel(wx.Panel):
         hhbox = wx.BoxSizer()
         hhbox.Add((10,-1))
         hhbox.Add(wx.StaticText(self.leftPanel, label="模型结构:", size=(70,-1)),0,wx.TOP,5)
-        self.modelStructureCombo = wx.ComboBox(self.leftPanel, value="原始LeNet模型", choices=LeNetModelList, size=(120,-1))
+        self.modelStructureCombo = wx.ComboBox(self.leftPanel, value="LeeNet", choices=LeNetModelList, size=(240,-1))
         hhbox.Add(self.modelStructureCombo, 0)
         vbox.Add(hhbox, 0, wx.EXPAND)
         vbox.Add((-1,10))
         hhbox = wx.BoxSizer()
         hhbox.Add((10,-1))
+        modelName = self.modelStructureCombo.GetValue()
+        preList = os.listdir("model/"+modelName+'/')
         hhbox.Add(wx.StaticText(self.leftPanel, label="预训练模型:", size=(70,-1)),0,wx.TOP,5)
-        self.preModelCombo = wx.ComboBox(self.leftPanel, value="原始LeNet模型", choices=LeNetModelList, size=(120,-1))
+        self.preModelCombo = wx.ComboBox(self.leftPanel, value=preList[-1], choices=preList, size=(240,-1))
         hhbox.Add(self.preModelCombo, 0)
         vbox.Add(hhbox, 0, wx.EXPAND)
+        vbox.Add(wx.Panel(self.leftPanel),1)
+        self.runBTN = wx.Button(self.leftPanel, label="运行", size=(200, 35))
+        self.runBTN.Bind(wx.EVT_BUTTON, self.RunErrorTest)
+        vbox.Add(self.runBTN, 0, wx.EXPAND|wx.ALL, 2)
         self.leftPanel.SetSizer(vbox)
 
         hhbox=wx.BoxSizer()
@@ -92,14 +85,39 @@ class LeNetMNISTPanel(wx.Panel):
         self.middlePanel.SetSizer(hhbox)
 
         vvbox=wx.BoxSizer(wx.VERTICAL)
+        self.buttonIDList=[]
+        self.buttonList=[]
+        self.panelList=[]
         for i in range(10):
             hhbox = wx.BoxSizer()
-            button = wx.Button(self.rightPanel,label="%d"%i,size=(50,10))
+            id = wx.NewId()
+            self.buttonIDList.append(id)
+            button = wx.Button(self.rightPanel, id, label="%d"%i, size=(50, 10))
+            self.buttonList.append(button)
             hhbox.Add(button, 0,wx.EXPAND)
             panel = ErrorPicPanel(self.rightPanel)
+            self.panelList.append(panel)
             hhbox.Add(panel,1, wx.EXPAND)
             vvbox.Add(hhbox,1,wx.EXPAND)
         self.rightPanel.SetSizer(vvbox)
+        self.Bind(wx.EVT_BUTTON, self.OnButton)
+
+    def OnButton(self, event):
+        objectId = event.GetId()
+        if objectId in self.buttonIDList:
+            index = self.buttonIDList.index(objectId)
+
+    def RunErrorTest(self, event):
+        modelStructure = self.modelStructureCombo.GetValue()
+        modelStructure = LeNetModelList.index(modelStructure)
+        preModel = self.preModelCombo.GetValue()
+        errorList = ErrorTest(modelStructure, preModel)
+        for i in range(10):
+            self.panelList[i].data=[]
+        for index, label, predict in errorList:
+            self.panelList[predict].data.append([index,label])
+        for i in range(10):
+            self.panelList[i].ReCreate()
 
 class LeNetPanel(wx.Panel):
     def __init__(self, parent,  log):
